@@ -49,6 +49,19 @@ case "$1" in
 		fi
 
 		/etc/init.d/oracle-xe start
+
+		if [ ! -z $ORACLE_USER ] && [ ! -z $ORACLE_PASSWORD ] ; then
+		        echo "ORACLE_USER: $ORACLE_USER"
+		        echo "ORACLE_PASSWORD: $ORACLE_PASSWORD"
+		        cat <<-EOSQL > create_user.sql
+		                CREATE USER $ORACLE_USER IDENTIFIED BY $ORACLE_PASSWORD;
+				GRANT ALL PRIVILEGES TO $ORACLE_USER;
+		                quit
+			EOSQL
+		        sqlplus system/oracle@localhost @./create_user.sql
+		        rm ./create_user.sql
+		fi
+
 		echo "Database ready to use. Enjoy! ;)"
 
 		##
